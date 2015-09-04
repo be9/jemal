@@ -5,6 +5,10 @@ class JemalTest < Minitest::Test
     refute_nil ::Jemal::VERSION
   end
 
+  def test_that_ruby_was_built_with_jemalloc
+    assert_equal true, Jemal.jemalloc_builtin?
+  end
+
   def test_that_it_returns_jemalloc_version
     assert_match /^\d+\.\d+\.\d+/, Jemal.version
   end

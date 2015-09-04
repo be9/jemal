@@ -10,6 +10,15 @@ module Jemal
   #             void *newp, size_t newlen);
   attach_function :mallctl, [:string, :pointer, :pointer, :pointer, :size_t], :int
 
+  # Public: Check if Ruby was built with jemalloc.
+  #
+  # Returns true if it was, false otherwise.
+  def self.jemalloc_builtin?
+    require 'rbconfig'
+
+    !!(RbConfig::CONFIG["configure_args"] =~ /jemalloc/)
+  end
+
   # void malloc_stats_print(void (*write_cb) (void *, const char *),
   #                         void *cbopaque, const char *opts);
   # TODO
