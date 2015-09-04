@@ -9,8 +9,8 @@ class JemalTest < Minitest::Test
     assert_match /^\d+\.\d+\.\d+/, Jemal.version
   end
 
-  def test_config
-    cfg = Jemal.config
+  def test_build_configuration
+    cfg = Jemal.build_configuration
 
     assert_kind_of Hash, cfg
 

@@ -34,17 +34,17 @@ module Jemal
   CFG_PARAMS = %i(debug dss fill lazy_lock mremap munmap prof prof_libgcc
                   prof_libunwind stats tcache tls utrace valgrind xmalloc)
 
-  # Public: Returns jemalloc config.
+  # Public: Get jemalloc build configuration.
   #
   # Returns all config.* parameters in a single Hash.
   #
   # Examples
   #
-  #   Jemal.config
+  #   Jemal.build_configuration
   #   # => {:debug=>false, :dss=>false, :fill=>true, :lazy_lock=>false, ... }
   #
   # Returns a Hash with Symbol keys and boolean values.
-  def self.config
+  def self.build_configuration
     CFG_PARAMS.inject({}) do |hash, param|
       hash[param] = get_bool("config.#{param}")
       hash
