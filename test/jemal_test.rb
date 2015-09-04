@@ -24,4 +24,10 @@ class JemalTest < Minitest::Test
       assert_includes [true, false], v
     end
   end
+
+  def test_abort
+    ab = Jemal.abort?
+
+    assert_includes [true, false], ab
+  end
 end

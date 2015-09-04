@@ -60,6 +60,17 @@ module Jemal
     end
   end
 
+  # Public: Checks if abort-on-warning enabled/disabled.
+  #
+  # If true, most warnings are fatal. The process will call abort(3) in these
+  # cases. This option is disabled by default unless --enable-debug is
+  # specified during configuration, in which case it is enabled by default.
+  #
+  # Returns true if enabled.
+  def self.abort?
+    get_bool "opt.abort"
+  end
+
   private
 
   # Private: Use mallctl to read boolean value.
