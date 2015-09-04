@@ -30,4 +30,12 @@ class JemalTest < Minitest::Test
 
     assert_includes [true, false], ab
   end
+
+  def test_lg_chunk
+    assert_equal 22, Jemal.lg_chunk
+  end
+
+  def test_narenas
+    assert_equal true, Jemal.narenas > 0
+  end
 end

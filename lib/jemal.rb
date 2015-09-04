@@ -1,14 +1,8 @@
 require 'jemal/version'
-require 'ffi'
+require 'jemal/interface'
 
 module Jemal
-  extend FFI::Library
-
-  ffi_lib [FFI::CURRENT_PROCESS, 'jemalloc']
-
-  # int mallctl(const char *name, void *oldp, size_t *oldlenp,
-  #             void *newp, size_t newlen);
-  attach_function :mallctl, [:string, :pointer, :pointer, :pointer, :size_t], :int
+  extend Jemal::Interface
 
   # Public: Check if Ruby was built with jemalloc.
   #
@@ -18,10 +12,6 @@ module Jemal
 
     !!(RbConfig::CONFIG["configure_args"] =~ /jemalloc/)
   end
-
-  # void malloc_stats_print(void (*write_cb) (void *, const char *),
-  #                         void *cbopaque, const char *opts);
-  # TODO
 
   # Public: Get jemalloc version.
   #
@@ -71,39 +61,32 @@ module Jemal
     get_bool "opt.abort"
   end
 
-  private
+  # TODO opt.dss
 
-  # Private: Use mallctl to read boolean value.
+  # Public: Get virtual memory chunk size (log base 2).
   #
-  # name - the String with parameter name.
+  # If a chunk size outside the supported size range is specified, the size is
+  # silently clipped to the minimum/maximum supported size. The default chunk
+  # size is 4 MiB (2^22).
   #
-  # Returns true or false.
-  def self.get_bool(name)
-    ptr = FFI::MemoryPointer.new :bool
-    mallctl name, ptr, size_pointer(ptr), nil, 0
-    ptr.get_uchar(0) > 0
+  # Examples
+  #
+  #   Jemal.lg_chunk
+  #   # => 22
+  #
+  # Returns chunk size logarithm.
+  def self.lg_chunk
+    @lg_chunk ||= get_size_t "opt.lg_chunk"
   end
 
-  # Private: Set up a size_t pointer.
+  # Public: Get maximum number of arenas to use for automatic multiplexing of
+  # threads and arenas.
   #
-  # Creates a pointer to size_t value, which is set to
-  # baseptr.size.
+  # The default is four times the number of CPUs, or one if there is a single
+  # CPU.
   #
-  # baseptr - a FFI::MemoryPointer instance.
-  #
-  # Returns a FFI::MemoryPointer.
-  def self.size_pointer(baseptr)
-    sizeptr = FFI::MemoryPointer.new :size_t
-
-    case sizeptr.size
-    when 8
-      sizeptr.write_int64 baseptr.size
-    when 4
-      sizeptr.write_int32 baseptr.size
-    else
-      raise ArgumentError, "Unsupported architecture: size_t size = #{sizeptr.size}"
-    end
-
-    sizeptr
+  # Returns Integer number of arenas.
+  def self.narenas
+    @narenas ||= get_size_t "opt.narenas"
   end
 end
