@@ -5,7 +5,7 @@ class JemalTest < Minitest::Test
     refute_nil ::Jemal::VERSION
   end
 
-  def test_it_does_something_useful
-    assert false
+  def test_that_it_returns_jemalloc_version
+    assert_match /^\d+\.\d+\.\d+/, Jemal.version
   end
 end
