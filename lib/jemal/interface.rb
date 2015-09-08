@@ -39,12 +39,45 @@ module Jemal
 
       case ptr.size
       when 8
+        ptr.read_uint64
+      when 4
+        ptr.read_uint32
+      else
+        raise ArgumentError, "Unsupported architecture: size_t size = #{ptr.size}"
+      end
+    end
+
+    # Private: Use mallctl to read size_t value.
+    #
+    # name - the String with parameter name.
+    #
+    # Returns Numeric value.
+    def get_ssize_t(name)
+      ptr = FFI::MemoryPointer.new :ssize_t
+      mallctl name, ptr, size_pointer(ptr), nil, 0
+
+      case ptr.size
+      when 8
         ptr.read_int64
       when 4
         ptr.read_int32
       else
-        raise ArgumentError, "Unsupported architecture: size_t size = #{ptr.size}"
+        raise ArgumentError, "Unsupported architecture: ssize_t size = #{ptr.size}"
       end
+    end
+
+    # Private: Use mallctl to read string value.
+    #
+    # name - the String with parameter name.
+    #
+    # Returns String or nil.
+    def get_string(name)
+      ptr = FFI::MemoryPointer.new :pointer
+
+      mallctl name, ptr, size_pointer(ptr), nil, 0
+
+      strptr = ptr.read_pointer
+      strptr.null? ? nil : strptr.read_string
     end
 
     # Private: Set up a size_t pointer.

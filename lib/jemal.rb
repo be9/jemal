@@ -22,12 +22,7 @@ module Jemal
   #
   # Returns the String version.
   def self.version
-    ptr = FFI::MemoryPointer.new :pointer
-
-    mallctl "version", ptr, size_pointer(ptr), nil, 0
-
-    strptr = ptr.read_pointer
-    strptr.null? ? nil : strptr.read_string
+    get_string "version"
   end
 
   CFG_PARAMS = %i(debug dss fill lazy_lock mremap munmap prof prof_libgcc
@@ -50,43 +45,23 @@ module Jemal
     end
   end
 
-  # Public: Checks if abort-on-warning enabled/disabled.
-  #
-  # If true, most warnings are fatal. The process will call abort(3) in these
-  # cases. This option is disabled by default unless --enable-debug is
-  # specified during configuration, in which case it is enabled by default.
-  #
-  # Returns true if enabled.
-  def self.abort?
-    get_bool "opt.abort"
-  end
+  OPT_BOOL = %i(abort stats_print redzone zero utrace xmalloc tcache
+                prof prof_active prof_thread_active_init prof_accum prof_gdump prof_final prof_leak)
+  OPT_SIZE_T = %i(lg_chunk narenas quarantine lg_tcache_max lg_prof_sample)
+  OPT_SSIZE_T = %i(lg_dirty_mult lg_prof_interval)
+  OPT_CHARP = %i(dss junk prof_prefix)
 
-  # TODO opt.dss
+  # Public: Get options (opt.*) as a Hash
+  #
+  # Returns Hash with 24 options.
+  def self.options
+    res = {}
 
-  # Public: Get virtual memory chunk size (log base 2).
-  #
-  # If a chunk size outside the supported size range is specified, the size is
-  # silently clipped to the minimum/maximum supported size. The default chunk
-  # size is 4 MiB (2^22).
-  #
-  # Examples
-  #
-  #   Jemal.lg_chunk
-  #   # => 22
-  #
-  # Returns chunk size logarithm.
-  def self.lg_chunk
-    @lg_chunk ||= get_size_t "opt.lg_chunk"
-  end
+    OPT_BOOL.each    { |o| res[o] = get_bool("opt.#{o}") }
+    OPT_SIZE_T.each  { |o| res[o] = get_size_t("opt.#{o}") }
+    OPT_SSIZE_T.each { |o| res[o] = get_ssize_t("opt.#{o}") }
+    OPT_CHARP.each   { |o| res[o] = get_string("opt.#{o}") }
 
-  # Public: Get maximum number of arenas to use for automatic multiplexing of
-  # threads and arenas.
-  #
-  # The default is four times the number of CPUs, or one if there is a single
-  # CPU.
-  #
-  # Returns Integer number of arenas.
-  def self.narenas
-    @narenas ||= get_size_t "opt.narenas"
+    res
   end
 end

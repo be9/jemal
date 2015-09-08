@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'pp'
 
 class JemalTest < Minitest::Test
   def test_that_it_has_a_version_number
@@ -25,17 +26,7 @@ class JemalTest < Minitest::Test
     end
   end
 
-  def test_abort
-    ab = Jemal.abort?
-
-    assert_includes [true, false], ab
-  end
-
-  def test_lg_chunk
-    assert_equal 22, Jemal.lg_chunk
-  end
-
-  def test_narenas
-    assert_equal true, Jemal.narenas > 0
+  def test_options
+    assert_equal 24, Jemal.options.size
   end
 end
