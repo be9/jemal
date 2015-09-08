@@ -26,7 +26,25 @@ class JemalTest < Minitest::Test
     end
   end
 
+  def test_narenas
+    assert_equal true, Jemal.narenas > 0
+  end
+
   def test_options
     assert_equal 24, Jemal.options.size
+  end
+
+  def test_stats
+    stats = Jemal.stats
+
+
+    pp stats
+
+    Jemal.stats_print
+
+    pp Jemal.arenas_initialized
+
+    s2 = Jemal.arena_stats(0)
+    pp s2
   end
 end

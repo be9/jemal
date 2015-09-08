@@ -64,4 +64,78 @@ module Jemal
 
     res
   end
+
+  # Public: Get current number of arenas.
+  #
+  # Returns Integer value.
+  def self.narenas
+    get_uint "arenas.narenas"
+  end
+
+  def self.arenas_initialized
+    n = narenas
+    ptr = FFI::MemoryPointer.new :bool, n
+    mallctl "arenas.initialized", ptr, size_pointer(ptr), nil, 0
+
+    (0...n).map { |i| ptr.get_uchar(i) > 0 }
+  end
+
+  GLOBAL_STATS = %i(allocated active metadata resident mapped)
+
+  def self.stats
+    res = {}
+
+    GLOBAL_STATS.each { |s| res[s] = get_size_t("stats.#{s}") }
+
+    res[:cactive] = read_size_t(cactive_ptr)
+
+    ai = arenas_initialized
+    res[:arenas] = arenas = Array.new(ai.size)
+
+    ai.each_with_index do |init, i|
+      if init
+        arenas[i] = arena_stats(i)
+      end
+    end
+
+    res
+  end
+
+  ARN_SIZE_T = %i(pactive pdirty mapped metadata.mapped metadata.allocated)
+  ARN_UINT64 = %i(npurge nmadvise purged)
+
+  BIN_PARAMS = %i(allocated nmalloc ndalloc nrequests)
+  BIN_SIZES = %i(small large huge)
+
+  def self.arena_stats(i)
+    prefix = "stats.arenas.#{i}"
+
+    res = {
+      #dss:           get_string("#{prefix}dss"),
+      lg_dirty_mult: get_ssize_t("#{prefix}lg_dirty_mult"),
+      nthreads:      get_uint("#{prefix}nthreads"),
+    }
+
+    ARN_SIZE_T.each { |p| res[p] = get_size_t("#{prefix}#{p}") }
+    ARN_UINT64.each { |p| res[p] = get_uint64("#{prefix}#{p}") }
+
+    res[:bins] = bins = {}
+
+    res
+  end
+
+  def self.stats_print
+    malloc_stats_print nil,nil,nil
+  end
+
+  protected
+
+  def self.cactive_ptr
+    @cactive_ptr ||=
+      begin
+        ptr = FFI::MemoryPointer.new :pointer
+        mallctl "stats.cactive", ptr, size_pointer(ptr), nil, 0
+        ptr.read_pointer
+      end
+  end
 end

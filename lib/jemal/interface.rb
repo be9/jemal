@@ -13,7 +13,7 @@ module Jemal
     # void malloc_stats_print(void (*write_cb) (void *, const char *),
     #                         void *cbopaque, const char *opts);
     # TODO
-
+    attach_function :malloc_stats_print, [:pointer, :pointer, :pointer], :void
 
     protected
 
@@ -28,6 +28,29 @@ module Jemal
       ptr.get_uchar(0) > 0
     end
 
+    # Private: Use mallctl to read unsigned value.
+    #
+    # name - the String with parameter name.
+    #
+    # Returns Numeric value.
+    def get_uint(name)
+      ptr = FFI::MemoryPointer.new :uint
+      mallctl name, ptr, size_pointer(ptr), nil, 0
+
+      ptr.read_uint
+    end
+
+    # Private: Use mallctl to read unsigned 64-bit value.
+    #
+    # name - the String with parameter name.
+    #
+    # Returns Numeric value.
+    def get_uint64(name)
+      ptr = FFI::MemoryPointer.new :uint64
+      mallctl name, ptr, size_pointer(ptr), nil, 0
+      ptr.read_uint64
+    end
+
     # Private: Use mallctl to read size_t value.
     #
     # name - the String with parameter name.
@@ -37,14 +60,7 @@ module Jemal
       ptr = FFI::MemoryPointer.new :size_t
       mallctl name, ptr, size_pointer(ptr), nil, 0
 
-      case ptr.size
-      when 8
-        ptr.read_uint64
-      when 4
-        ptr.read_uint32
-      else
-        raise ArgumentError, "Unsupported architecture: size_t size = #{ptr.size}"
-      end
+      read_size_t(ptr)
     end
 
     # Private: Use mallctl to read size_t value.
@@ -56,14 +72,7 @@ module Jemal
       ptr = FFI::MemoryPointer.new :ssize_t
       mallctl name, ptr, size_pointer(ptr), nil, 0
 
-      case ptr.size
-      when 8
-        ptr.read_int64
-      when 4
-        ptr.read_int32
-      else
-        raise ArgumentError, "Unsupported architecture: ssize_t size = #{ptr.size}"
-      end
+      read_ssize_t(ptr)
     end
 
     # Private: Use mallctl to read string value.
@@ -90,17 +99,39 @@ module Jemal
     # Returns a FFI::MemoryPointer.
     def size_pointer(baseptr)
       sizeptr = FFI::MemoryPointer.new :size_t
+      write_size_t(sizeptr, baseptr.size)
+      sizeptr
+    end
 
-      case sizeptr.size
-      when 8
-        sizeptr.write_int64 baseptr.size
-      when 4
-        sizeptr.write_int32 baseptr.size
-      else
-        raise ArgumentError, "Unsupported architecture: size_t size = #{sizeptr.size}"
+    case FFI::Platform::ADDRESS_SIZE
+    when 64
+      def read_size_t(ptr)
+        ptr.read_uint64
       end
 
-      sizeptr
+      def write_size_t(ptr, value)
+        ptr.write_uint64 value
+      end
+
+      def read_ssize_t(ptr)
+        ptr.read_int64
+      end
+
+    when 32
+      def read_size_t(ptr)
+        ptr.read_uint32
+      end
+
+      def write_size_t(ptr, value)
+        ptr.write_uint32 value
+      end
+
+      def read_ssize_t(ptr)
+        ptr.read_int32
+      end
+
+    else
+      raise "Unsupported platform address size = #{FFI::Platform::ADDRESS_SIZE}"
     end
   end
 end
