@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
   spec.email         = ["olegdashevskii@gmail.com"]
 
   spec.summary       = %q{Interface to jemalloc}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.description   = %q{Means to access jemalloc options and statistics for MRI compiled with jemalloc support.}
+  spec.homepage      = "https://github.com/be9/jemal"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
