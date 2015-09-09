@@ -40,6 +40,17 @@ module Jemal
       ptr.read_uint
     end
 
+    # Private: Use mallctl to read unsigned 32-bit value.
+    #
+    # name - the String with parameter name.
+    #
+    # Returns Numeric value.
+    def get_uint32(name)
+      ptr = FFI::MemoryPointer.new :uint32
+      mallctl name, ptr, size_pointer(ptr), nil, 0
+      ptr.read_uint32
+    end
+
     # Private: Use mallctl to read unsigned 64-bit value.
     #
     # name - the String with parameter name.

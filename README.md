@@ -1,10 +1,35 @@
 # Jemal
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/jemal`. To experiment with that code, run `bin/console` for an interactive prompt.
+This gem provides interface to your MRI built with [jemalloc](canonware.com/jemalloc/).
+Of course you heard that
+Ruby 2.2.0 [introduced jemalloc support](https://www.ruby-lang.org/en/news/2014/12/25/ruby-2-2-0-released/).
 
-TODO: Delete this and the text above, and describe your gem
+Primary goal of this gem is to provide access to jemalloc statistics.
 
-## Installation
+Currently jemalloc 3.6.0 is supported (certain Ruby gems can't yet be built
+with 4.0.0 due to stdbool.h conflict).
+
+## Jemalloc installation
+
+Ubuntu:
+
+    $ sudo apt-get install libjemalloc-dev
+
+OS X:
+
+    $ brew install jemalloc
+
+
+Note that if you want to use allocation profiling, you'll have to build
+jemalloc from source (`./configure --enable-prof`). Both ubuntu and homebrew versions
+are built without this option.
+
+## Ruby with jemalloc installation
+
+
+Instructions are [here](http://groguelon.fr/post/106221222318/how-to-install-ruby-220-with-jemalloc-support).
+
+## Gem installation
 
 Add this line to your application's Gemfile:
 
@@ -24,18 +49,10 @@ Or install it yourself as:
 
 TODO: Write usage instructions here
 
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/jemal.
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/be9/jemal.
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
