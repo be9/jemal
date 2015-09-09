@@ -9,6 +9,9 @@ Primary goal of this gem is to provide access to jemalloc statistics.
 Currently jemalloc 3.6.0 is supported (certain Ruby gems can't yet be built
 with 4.0.0 due to stdbool.h conflict).
 
+Note that there's another [jemalloc-related gem](https://github.com/kzk/jemalloc-rb) on RubyGems.
+It doesn't provide interface to builtin jemalloc, but rather aims at injecting jemalloc in runtime with LD_PRELOAD.
+
 ## Jemalloc installation
 
 Ubuntu:
@@ -97,7 +100,7 @@ Jemal.stats
 The returned hash is quite big, it contains joint statistics, as well as statistics for each arena. Read 
 [jemalloc man page](http://www.unix.com/man-page/freebsd/3/jemalloc/) to be able to understand the figures (look for `stats.*`).
 
-If you just want human-compatible stats in text form and `STDERR` is okay, you are covered:
+If you just want human-compatible stats in text form and `STDERR` is okay, you are also covered:
 
 ```ruby
 Jemal.stats_print
@@ -203,6 +206,7 @@ Jemal.options       # Returns runtime jemalloc options
 
 Jemal.sizes         # Returns some constant sizes (page, bin, lrun)
 # => { :page_size=>4096, ... }
+```
 
 ## Contributing
 
