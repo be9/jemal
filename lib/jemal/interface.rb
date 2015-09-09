@@ -62,6 +62,17 @@ module Jemal
       ptr.read_uint64
     end
 
+    # Private: Use mallctl to write unsigned 64-bit value.
+    #
+    # name - the String with parameter name.
+    #
+    # Returns nothing.
+    def write_uint64(name, value)
+      ptr = FFI::MemoryPointer.new :uint64
+      ptr.write_uint64 value
+      mallctl name, nil, nil, ptr, ptr.size
+    end
+
     # Private: Use mallctl to read size_t value.
     #
     # name - the String with parameter name.

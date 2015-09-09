@@ -153,7 +153,11 @@ module Jemal
   # Public: Get current statistics.
   #
   # Returns stats as one big Hash.
-  def self.stats
+  def self.stats(refresh: true)
+    if refresh
+      write_uint64("epoch", 1)
+    end
+
     res = {}
 
     GLOBAL_STATS.each { |s| res[s] = get_size_t("stats.#{s}") }
