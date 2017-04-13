@@ -28,7 +28,7 @@ class JemalTest < Minitest::Test
   end
 
   def test_options
-    assert_equal 23, Jemal.options.size
+    assert_equal 22, Jemal.options.size
   end
 
   def test_arenas_count
@@ -64,12 +64,7 @@ class JemalTest < Minitest::Test
     assert_kind_of Hash, b
     assert_operator b[:size], :>, 0
     assert_operator b[:nregs], :>, 0
-    assert_operator b[:run_size], :>, 0
-
-    assert_kind_of Array, sz[:lruns]
-    assert_operator sz[:lruns].size,  :>, 0
-
-    assert_kind_of Integer, sz[:lruns].first
+    assert_operator b[:slab_size], :>, 0
   end
 
   def test_sizes_caching
@@ -87,17 +82,9 @@ class JemalTest < Minitest::Test
     assert_operator s[:metadata],  :>=, 0
     assert_operator s[:resident],  :>=, 0
     assert_operator s[:mapped],    :>, 0
-    assert_operator s[:cactive],   :>, 0
-
-    ch = s[:chunks]
-    assert_kind_of Hash, ch
-
-    assert_operator ch[:current], :>, 0
-    assert_operator ch[:total], :>, 0
-    assert_operator ch[:high], :>, 0
 
     assert_kind_of Array, s[:arenas]
-    assert_equal Jemal.arenas_count, s[:arenas].size
+    assert_equal Jemal.initialized_arenas.size, s[:arenas].size
   end
 
   def test_arena_stats
@@ -132,7 +119,6 @@ class JemalTest < Minitest::Test
     assert_operator sl[:nrequests], :>, 0
 
     assert_kind_of Hash, s[:bins]
-    assert_kind_of Hash, s[:lruns]
 
     # TODO test bins and lruns contents
   end
